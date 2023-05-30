@@ -1,13 +1,11 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import renderer from 'react-test-renderer';
-import { IntlProvider } from 'react-intl';
-import View from './View';
-import configureStore from 'redux-mock-store';
-import { Provider } from 'react-intl-redux';
-import config from '@plone/volto/registry';
+import React from 'react'
+import renderer from 'react-test-renderer'
+import View from './View'
+import configureStore from 'redux-mock-store'
+import { Provider } from 'react-intl-redux'
+import config from '@plone/volto/registry'
 
-const mockStore = configureStore();
+const mockStore = configureStore()
 
 jest.mock('@plone/volto/registry', () => ({
   blocks: {
@@ -17,7 +15,7 @@ jest.mock('@plone/volto/registry', () => ({
       },
     },
   },
-}));
+}))
 
 config.blocks.blocksConfig = {
   typeA: {
@@ -29,13 +27,13 @@ config.blocks.blocksConfig = {
   typeC: {
     tocEntry: () => [2],
   },
-};
+}
 
 jest.mock('@plone/volto/helpers', () => ({
   getBlocksFieldname: jest.fn(() => 'blocksFieldname'),
   getBlocksLayoutFieldname: jest.fn(() => 'blocksLayoutFieldname'),
   withBlockExtensions: jest.fn((Component) => Component),
-}));
+}))
 
 describe('View', () => {
   const store = mockStore({
@@ -43,7 +41,7 @@ describe('View', () => {
       locale: 'en',
       messages: {},
     },
-  });
+  })
 
   const properties = {
     blocksFieldname: {
@@ -56,7 +54,7 @@ describe('View', () => {
     blocksLayoutFieldname: {
       items: ['id1'],
     },
-  };
+  }
 
   const mockPropsNested = {
     properties: {
@@ -75,7 +73,7 @@ describe('View', () => {
       view: () => <div>Renderer Component</div>,
       id: 'variation-id',
     },
-  };
+  }
 
   it('renders Table of content message when in edit mode with no title and no tocEntries and renders custom Renderer', () => {
     const component = renderer.create(
@@ -88,12 +86,12 @@ describe('View', () => {
           mode="edit"
           data={{ levels: [] }}
         />
-      </Provider>,
-    );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
-    expect(component.toJSON().props.className).toContain('table-of-contents');
-  });
+      </Provider>
+    )
+    const json = component.toJSON()
+    expect(json).toMatchSnapshot()
+    expect(component.toJSON().props.className).toContain('table-of-contents')
+  })
 
   it('renders Table of content message when in edit mode with no title and no tocEntries and renders custom Renderer', () => {
     const component = renderer.create(
@@ -110,23 +108,23 @@ describe('View', () => {
             id: 'variation-id',
           }}
         />
-      </Provider>,
-    );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
-    expect(component.toJSON().props.className).toContain('table-of-contents');
-  });
+      </Provider>
+    )
+    const json = component.toJSON()
+    expect(json).toMatchSnapshot()
+    expect(component.toJSON().props.className).toContain('table-of-contents')
+  })
 
   it('renders Table of content message when in edit mode with no title and tocEntries and renders custom Renderer', () => {
     const component = renderer.create(
       <Provider store={store}>
         <View properties={properties} mode="edit" data={{ levels: [] }} />
-      </Provider>,
-    );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
-    expect(component.toJSON().props.className).toContain('table-of-contents');
-  });
+      </Provider>
+    )
+    const json = component.toJSON()
+    expect(json).toMatchSnapshot()
+    expect(component.toJSON().props.className).toContain('table-of-contents')
+  })
 
   it('undefined type', () => {
     const properties1 = {
@@ -140,22 +138,22 @@ describe('View', () => {
       blocksLayoutFieldname: {
         items: ['id1'],
       },
-    };
+    }
     const store = mockStore({
       intl: {
         locale: 'en',
         messages: {},
       },
-    });
+    })
     const component = renderer.create(
       <Provider store={store}>
         <View properties={properties1} mode="edit" data={{ levels: [] }} />
-      </Provider>,
-    );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
-    expect(component.toJSON().props.className).toContain('table-of-contents');
-  });
+      </Provider>
+    )
+    const json = component.toJSON()
+    expect(json).toMatchSnapshot()
+    expect(component.toJSON().props.className).toContain('table-of-contents')
+  })
 
   it('there are no blocks with the given id in layout', () => {
     const properties1 = {
@@ -163,31 +161,31 @@ describe('View', () => {
       blocksLayoutFieldname: {
         items: ['id1'],
       },
-    };
+    }
     const store = mockStore({
       intl: {
         locale: 'en',
         messages: {},
       },
-    });
+    })
     const component = renderer.create(
       <Provider store={store}>
         <View properties={properties1} mode="edit" data={{ levels: [] }} />
-      </Provider>,
-    );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
-    expect(component.toJSON().props.className).toContain('table-of-contents');
-  });
+      </Provider>
+    )
+    const json = component.toJSON()
+    expect(json).toMatchSnapshot()
+    expect(component.toJSON().props.className).toContain('table-of-contents')
+  })
 
   it('nested TOC entries', () => {
     const component = renderer.create(
       <Provider store={store}>
         <View {...mockPropsNested} />
-      </Provider>,
-    );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
-    expect(component.toJSON().props.className).toContain('table-of-contents');
-  });
-});
+      </Provider>
+    )
+    const json = component.toJSON()
+    expect(json).toMatchSnapshot()
+    expect(component.toJSON().props.className).toContain('table-of-contents')
+  })
+})
