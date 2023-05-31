@@ -10,7 +10,7 @@ exports[`View nested TOC entries 1`] = `
 </div>
 `;
 
-exports[`View renders Table of content message when in edit mode with no title and no tocEntries and renders custom Renderer 1`] = `
+exports[`View renders Table of content message when in edit mode with no title and no tocEntries and does not render custom Renderer 1`] = `
 <div
   className="table-of-contents"
 >
@@ -25,7 +25,7 @@ exports[`View renders Table of content message when in edit mode with no title a
 </div>
 `;
 
-exports[`View renders Table of content message when in edit mode with no title and no tocEntries and renders custom Renderer 2`] = `
+exports[`View renders Table of content message when in edit mode with no title and no tocEntries and renders custom Renderer 1`] = `
 <div
   className="table-of-contents variation-id"
 >
