@@ -1,13 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { openAccordionIfContainsAnchors } from '@eeacms/volto-anchors/helpers';
+import {
+  openAccordionIfContainsAnchors,
+  waitForElm,
+  scrollToTarget,
+} from '@eeacms/volto-anchors/helpers';
 
 const ScrollToAnchor = (props) => {
   const { location } = props;
 
   React.useEffect(() => {
     const anchor = location?.hash || location?.pathname.hash;
-    if (anchor) openAccordionIfContainsAnchors(anchor);
+    if (anchor) {
+      waitForElm(anchor).then((elm) => {
+        scrollToTarget(elm);
+      });
+      openAccordionIfContainsAnchors(anchor);
+    }
   }, [location]);
 
   return null;
