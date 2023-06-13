@@ -12,9 +12,14 @@ const ScrollToAnchor = (props) => {
   React.useEffect(() => {
     const anchor = location?.hash || location?.pathname.hash;
     if (anchor) {
-      waitForElm(anchor).then((elm) => {
-        scrollToTarget(elm);
-      });
+      waitForElm(anchor)
+        .then((elm) => {
+          scrollToTarget(elm);
+        })
+        .catch((err) => {
+          // eslint-disable-next-line no-console
+          console.error(err);
+        });
       openAccordionIfContainsAnchors(anchor);
     }
   }, [location]);
