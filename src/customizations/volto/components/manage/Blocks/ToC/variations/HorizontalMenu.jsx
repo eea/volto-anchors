@@ -42,14 +42,14 @@ const View = ({ data, tocEntries }) => {
 
     // Get all divs that contain the items from the TOC, except the dropdown button
     const nested = document.querySelectorAll(
-      '.responsive-menu .item:not(.dropdown)',
+      '.responsive-menu .item:not(.toc-dropdown)',
     );
     const nestedArray = Object.values(nested);
     const middle = Math.ceil(nestedArray.length / 2);
     const firstHalfNested = nestedArray.slice(0, middle);
     const secondHalfNested = nestedArray.slice(middle);
 
-    const dropdown = document.querySelector('.dropdown');
+    const dropdown = document.querySelector('.toc-dropdown');
     const dropdownWidth = dropdown.offsetWidth || 67;
 
     const firstHalfNestedHiddenItems = [];
@@ -177,7 +177,7 @@ const View = ({ data, tocEntries }) => {
         <Dropdown
           item
           text="More"
-          className="hidden-dropdown"
+          className="hidden-dropdown toc-dropdown"
           open={isDropdownOpen}
           onOpen={() => setIsDropdownOpen(true)}
           onClose={() => setIsDropdownOpen(false)}
