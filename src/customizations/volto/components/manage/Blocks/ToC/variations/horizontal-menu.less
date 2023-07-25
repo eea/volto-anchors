@@ -15,16 +15,24 @@
   display: none !important;
 }
 
-.table-of-contents.horizontalMenu .item.dropdown {
+
+.table-of-contents.horizontalMenu .item.toc-dropdown {
   position: absolute !important;
   right: 0;
+  height: 100%;
 }
 
 .table-of-contents.horizontalMenu > .ui.menu {
   position: relative;
 }
 
-.table-of-contents.horizontalMenu .item.dropdown .focused > a {
+
+.table-of-contents.horizontalMenu .item.toc-dropdown .focused > a {
   border: 2px solid black !important;
   border-radius: 4px;
+}
+
+.ui.menu .dropdown.item .menu {
+  right: 0;
+  left: auto;
 }
