@@ -50,7 +50,6 @@ const View = ({ data, tocEntries }) => {
     const secondHalfNested = nestedArray.slice(middle);
 
     const dropdown = document.querySelector('.toc-dropdown');
-
     const dropdownWidth = dropdown.offsetWidth || 67;
 
     const firstHalfNestedHiddenItems = [];
