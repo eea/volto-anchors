@@ -83,47 +83,9 @@ const View = ({ data, tocEntries }) => {
   };
 
   const handleDropdownKeyDown = (event) => {
-    const dropdownMenu = document.querySelector('.menu.transition');
-    if (event.key === 'ArrowDown' && isDropdownOpen) {
+    if (event.key === 'Enter') {
       event.preventDefault();
-      const menuItems = dropdownMenu.querySelectorAll(
-        '.item:not(.hidden-dropdown)',
-      );
-      const focusedItem = dropdownMenu.querySelector('.item.focused');
-      const focusedIndex = Array.from(menuItems).indexOf(focusedItem);
-
-      if (focusedIndex === -1) {
-        // No item is currently focused, so focus the first item
-        menuItems[0].classList.add('focused');
-      } else if (focusedIndex === menuItems.length - 1) {
-        // Remove focus from the currently focused item and close the dropdown
-        focusedItem.classList.remove('focused');
-        setIsDropdownOpen(false);
-
-        // Focus the next element on the page
-        const nextElement = dropdownMenu.nextElementSibling;
-        if (nextElement) {
-          nextElement.focus();
-        }
-      } else {
-        // Remove focus from the currently focused item
-        focusedItem.classList.remove('focused');
-
-        // Focus the next item or wrap around to the first item
-        const nextIndex = (focusedIndex + 1) % menuItems.length;
-        menuItems[nextIndex].classList.add('focused');
-      }
-    } else if (event.key === 'Enter' && isDropdownOpen) {
-      const focusedItem = dropdownMenu.querySelector('.item.focused');
-      if (focusedItem) {
-        focusedItem.querySelector('a').click();
-        focusedItem.classList.remove('focused');
-      }
-    } else if (event.key === 'Tab') {
-      const focusedItem = dropdownMenu.querySelector('.item.focused');
-      if (focusedItem) {
-        focusedItem.classList.remove('focused');
-      }
+      event.target.click();
     }
   };
 
@@ -182,6 +144,12 @@ const View = ({ data, tocEntries }) => {
           onOpen={() => setIsDropdownOpen(true)}
           onClose={() => setIsDropdownOpen(false)}
           tabIndex={0}
+          aria-label="dropdown"
+          role="dropdown"
+          closeOnChange={true}
+          closeOnBlur={false}
+          openOnFocus={false}
+          closeOnEscape={true}
           onKeyDown={handleDropdownKeyDown}
         >
           <Dropdown.Menu>
