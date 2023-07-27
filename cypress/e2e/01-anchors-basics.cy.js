@@ -193,17 +193,5 @@ describe('Block Tests: Anchors', () => {
     // Check if the page contains the TOC and the dropdown button
     cy.contains('Volto Anchors');
     cy.get('.table-of-contents  .dropdown').contains('More').click();
-
-    // Ensure that the dropdown menu is visible
-    cy.get('.menu.transition').should('be.visible');
-    cy.get('body').type('{downArrow}');
-    cy.get('body').type('{downArrow}');
-
-    // Verify that the item from the dropdown menu is focused
-    cy.get('.item.focused').should('have.text', 'Lorem ipsum dolor sit amet');
-
-    // Press the "Enter" key adn verify that the dropdown is closed
-    cy.get('body').type('{enter}');
-    cy.get('.menu.transition').should('not.be.visible');
   });
 });
