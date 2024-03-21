@@ -29,21 +29,30 @@ describe('Block Tests: Anchors', () => {
     cy.getSlate().click({ force: true });
 
     // Add TOC block
-    cy.get('.ui.basic.icon.button.block-add-button').first().click();
+    cy.get('.ui.basic.icon.button.block-add-button')
+      .first()
+      .click({ force: true });
     cy.get(".blocks-chooser .ui.form .field.searchbox input[type='text']").type(
       'table of contents',
     );
-    cy.get('.button.toc').click();
+    cy.get('.button.toc').click({ force: true });
 
     // Add headings
-    cy.get('.ui.drag.block.inner.slate').click().type('Title 1').click();
+    cy.get('.ui.drag.block.inner.slate')
+      .click()
+      .type('Title 1')
+      .click({ force: true });
     cy.get('.ui.drag.block.inner.slate span span span').setSelection('Title 1');
     cy.get('.slate-inline-toolbar .button-wrapper a[title="Title"]').click({
       force: true,
     });
     cy.get('.ui.drag.block.inner.slate').click().type('{enter}');
 
-    cy.get('.ui.drag.block.inner.slate').eq(1).click().type('Title 2').click();
+    cy.get('.ui.drag.block.inner.slate')
+      .eq(1)
+      .click()
+      .type('Title 2')
+      .click({ force: true });
     cy.get('.ui.drag.block.inner.slate span span span')
       .eq(1)
       .setSelection('Title 2');
@@ -73,20 +82,24 @@ describe('Block Tests: Anchors', () => {
     cy.getSlate().click({ force: true });
 
     // Add TOC block
-    cy.get('.ui.basic.icon.button.block-add-button').first().click();
+    cy.get('.ui.basic.icon.button.block-add-button')
+      .first()
+      .click({ force: true });
     cy.get(".blocks-chooser .ui.form .field.searchbox input[type='text']").type(
       'table of contents',
     );
     cy.get('.button.toc').click();
-    cy.get('#sidebar-properties .form .react-select-container').first().click();
-    cy.contains('Horizontal Menu').click();
-    cy.contains('Sticky').click();
+    cy.get('#sidebar-properties .form .react-select-container')
+      .first()
+      .click({ force: true });
+    cy.contains('Horizontal Menu').click({ force: true });
+    cy.contains('Sticky').click({ force: true });
 
     // Add headings
     cy.get('.ui.drag.block.inner.slate')
-      .click()
+      .click({ force: true })
       .type('Lorem ipsum dolor sit amet')
-      .click();
+      .click({ force: true });
     cy.get('.ui.drag.block.inner.slate span span span').setSelection(
       'Lorem ipsum dolor sit amet',
     );
@@ -97,9 +110,9 @@ describe('Block Tests: Anchors', () => {
 
     cy.get('.ui.drag.block.inner.slate')
       .eq(1)
-      .click()
+      .click({ force: true })
       .type('Lorem ipsum dolor sit amet')
-      .click();
+      .click({ force: true });
     cy.get('.ui.drag.block.inner.slate span span span')
       .eq(1)
       .setSelection('Lorem ipsum dolor sit amet');
@@ -110,7 +123,7 @@ describe('Block Tests: Anchors', () => {
 
     cy.get('.ui.drag.block.inner.slate')
       .eq(2)
-      .click()
+      .click({ force: true })
       .type('Lorem ipsum dolor sit amet')
       .click();
     cy.get('.ui.drag.block.inner.slate span span span')
@@ -119,26 +132,32 @@ describe('Block Tests: Anchors', () => {
     cy.get('.slate-inline-toolbar .button-wrapper a[title="Title"]').click({
       force: true,
     });
-    cy.get('.ui.drag.block.inner.slate').eq(2).click().type('{enter}');
+    cy.get('.ui.drag.block.inner.slate')
+      .eq(2)
+      .click({ force: true })
+      .type('{enter}');
 
     cy.get('.ui.drag.block.inner.slate')
       .eq(3)
-      .click()
+      .click({ force: true })
       .type('Lorem ipsum dolor sit amet')
-      .click();
+      .click({ force: true });
     cy.get('.ui.drag.block.inner.slate span span span')
       .eq(3)
       .setSelection('Lorem ipsum dolor sit amet');
     cy.get('.slate-inline-toolbar .button-wrapper a[title="Title"]').click({
       force: true,
     });
-    cy.get('.ui.drag.block.inner.slate').eq(3).click().type('{enter}');
+    cy.get('.ui.drag.block.inner.slate')
+      .eq(3)
+      .click({ force: true })
+      .type('{enter}');
 
     cy.get('.ui.drag.block.inner.slate')
       .eq(4)
-      .click()
+      .click({ force: true })
       .type('Lorem ipsum dolor sit amet')
-      .click();
+      .click({ force: true });
     cy.get('.ui.drag.block.inner.slate span span span')
       .eq(4)
       .setSelection('Lorem ipsum dolor sit amet');
@@ -149,9 +168,9 @@ describe('Block Tests: Anchors', () => {
 
     cy.get('.ui.drag.block.inner.slate')
       .eq(5)
-      .click()
+      .click({ force: true })
       .type('Lorem ipsum dolor sit amet')
-      .click();
+      .click({ force: true });
     cy.get('.ui.drag.block.inner.slate span span span')
       .eq(5)
       .setSelection('Lorem ipsum dolor sit amet');
@@ -162,9 +181,9 @@ describe('Block Tests: Anchors', () => {
 
     cy.get('.ui.drag.block.inner.slate')
       .eq(6)
-      .click()
+      .click({ force: true })
       .type('Lorem ipsum dolor sit amet')
-      .click();
+      .click({ force: true });
     cy.get('.ui.drag.block.inner.slate span span span')
       .eq(6)
       .setSelection('Lorem ipsum dolor sit amet');
@@ -175,9 +194,9 @@ describe('Block Tests: Anchors', () => {
 
     cy.get('.ui.drag.block.inner.slate')
       .eq(7)
-      .click()
+      .click({ force: true })
       .type('Lorem ipsum dolor sit amet')
-      .click();
+      .click({ force: true });
     cy.get('.ui.drag.block.inner.slate span span span')
       .eq(7)
       .setSelection('Lorem ipsum dolor sit amet');
@@ -188,10 +207,15 @@ describe('Block Tests: Anchors', () => {
 
     // Save page
     cy.get('#toolbar-save').click();
-    cy.url().should('eq', Cypress.config().baseUrl + '/cypress/my-page');
+    cy.url({ force: true }).should(
+      'eq',
+      Cypress.config().baseUrl + '/cypress/my-page',
+    );
 
     // Check if the page contains the TOC and the dropdown button
     cy.contains('Volto Anchors');
-    cy.get('.table-of-contents  .dropdown').contains('More').click();
+    cy.get('.table-of-contents  .dropdown')
+      .contains('More')
+      .click({ force: true });
   });
 });
