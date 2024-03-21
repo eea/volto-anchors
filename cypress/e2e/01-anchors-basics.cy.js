@@ -8,7 +8,7 @@ describe('Block Tests: Anchors', () => {
     // Change page title
     cy.clearSlateTitle();
     cy.getSlateTitle().type('Volto Anchors');
-    cy.getSlate().click();
+    cy.getSlate().click({ force: true });
 
     // Add TOC block
     cy.get('.ui.basic.icon.button.block-add-button').first().click();
@@ -26,7 +26,7 @@ describe('Block Tests: Anchors', () => {
     // Change page title
     cy.clearSlateTitle();
     cy.getSlateTitle().type('Volto Anchors');
-    cy.getSlate().click();
+    cy.getSlate().click({ force: true });
 
     // Add TOC block
     cy.get('.ui.basic.icon.button.block-add-button').first().click();
@@ -70,7 +70,7 @@ describe('Block Tests: Anchors', () => {
     // Change page title
     cy.clearSlateTitle();
     cy.getSlateTitle().type('Volto Anchors');
-    cy.getSlate().click();
+    cy.getSlate().click({ force: true });
 
     // Add TOC block
     cy.get('.ui.basic.icon.button.block-add-button').first().click();
