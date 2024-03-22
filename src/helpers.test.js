@@ -3,10 +3,10 @@ import config from '@plone/volto/registry';
 import { serializeNodes } from '@plone/volto-slate/editor/render';
 import * as helpers from './helpers';
 import '@testing-library/jest-dom/extend-expect';
-import renderer from 'react-test-renderer';
 import configureStore from 'redux-mock-store';
 import { Provider } from 'react-intl-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { render } from '@testing-library/react';
 
 const mockStore = configureStore();
 
@@ -211,29 +211,37 @@ describe('visitBlocks', () => {
 describe('renderLinkElement', () => {
   it('renders a link element with children and default props', () => {
     const TestComponent = helpers.renderLinkElement('div');
-    const component = renderer.create(
-      <TestComponent attributes={{ id: 'test' }}>Test test</TestComponent>,
+    const { getByText } = render(
+      <Provider store={store}>
+        <Router>
+          <TestComponent attributes={{ id: 'test' }}>Test test</TestComponent>
+        </Router>
+      </Provider>,
     );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
+    expect(getByText('Test test')).toBeInTheDocument();
+    expect(getByText('Test test').tagName).toBe('DIV');
+    expect(getByText('Test test')).toHaveAttribute('id', 'test');
   });
 
   it('renders a link element with a className', () => {
     const TestComponent = helpers.renderLinkElement('div');
-
-    const component = renderer.create(
-      <TestComponent className="test-class" attributes={{ id: 'test' }}>
-        Test test
-      </TestComponent>,
+    const { getByText } = render(
+      <Provider store={store}>
+        <Router>
+          <TestComponent className="test-class" attributes={{ id: 'test' }}>
+            Test test
+          </TestComponent>
+        </Router>
+      </Provider>,
     );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
+    expect(getByText('Test test')).toBeInTheDocument();
+    expect(getByText('Test test')).toHaveClass('test-class');
   });
 
-  it('renders a UniversalLink when mode is set to view', () => {
+  it('renders an anchor link when mode is set to view', () => {
     const TestComponent = helpers.renderLinkElement('div');
 
-    const component = renderer.create(
+    const { container } = render(
       <Provider store={store}>
         <Router>
           <TestComponent
@@ -246,7 +254,8 @@ describe('renderLinkElement', () => {
         </Router>
       </Provider>,
     );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
+    const aTag = container.querySelector('a');
+    expect(aTag).toBeInTheDocument();
+    expect(aTag).toHaveAttribute('href', '/#test');
   });
 });
