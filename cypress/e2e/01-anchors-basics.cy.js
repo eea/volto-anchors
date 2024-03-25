@@ -5,6 +5,7 @@ describe('Block Tests: Anchors', () => {
   afterEach(slateAfterEach);
 
   it('Add Block: Links', () => {
+    cy.waitForOverlayToDisappear(); // Wait for any potential overlay to disappear
     // Change page title
     cy.clearSlateTitle();
     cy.getSlateTitle().type('Volto Anchors');
@@ -23,6 +24,8 @@ describe('Block Tests: Anchors', () => {
   });
 
   it('Add Block: add content to TOC', () => {
+    cy.waitForOverlayToDisappear(); // Wait for any potential overlay to disappear
+
     // Change page title
     cy.clearSlateTitle();
     cy.getSlateTitle().type('Volto Anchors');
@@ -60,13 +63,15 @@ describe('Block Tests: Anchors', () => {
     cy.contains('Volto Anchors');
     cy.contains('Title 1');
     cy.contains('Title 2');
-    cy.get('a[href="#title-1"]').click();
-    cy.get('a[href="#title-2"]').click();
+    cy.get('a[href="/cypress/my-page#title-1"]').click({ multiple: true });
+    cy.get('a[href="/cypress/my-page#title-2"]').click({ multiple: true });
     cy.get('h2[id="title-1"]').contains('Title 1');
     cy.get('h2[id="title-2"]').contains('Title 2');
   });
 
   it('Add Block: add horizontal TOC', () => {
+    cy.waitForOverlayToDisappear(); // Wait for any potential overlay to disappear
+
     // Change page title
     cy.clearSlateTitle();
     cy.getSlateTitle().type('Volto Anchors');

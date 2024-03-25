@@ -1,4 +1,4 @@
-import DefaultTocRenderer from './DefaultTocRenderer';
+import DefaultTocRenderer from '@plone/volto/components/manage/Blocks/ToC/variations/DefaultTocRenderer';
 import HorizontalMenu from './HorizontalMenu';
 
 const ToCVariations = [

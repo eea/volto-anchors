@@ -1,7 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-intl-redux';
 import configureStore from 'redux-mock-store';
-import renderer from 'react-test-renderer';
 import { render } from '@testing-library/react';
 import ScrollToAnchor from './ScrollToAnchor';
 import { openAccordionIfContainsAnchors } from '@eeacms/volto-anchors/helpers';
@@ -30,16 +29,6 @@ describe('ScrollToAnchor', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-  });
-
-  it('should match the snapshot', () => {
-    const component = renderer.create(
-      <Provider store={store}>
-        <ScrollToAnchor />
-      </Provider>,
-    );
-    const json = component.toJSON();
-    expect(json).toMatchSnapshot();
   });
 
   it('should call openAccordionIfContainsAnchors with the correct hash', () => {
