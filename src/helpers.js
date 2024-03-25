@@ -19,14 +19,10 @@ export const toSlug = (url) => Slugger.slug(url);
 
 export const waitForElm = (selector) => {
   return new Promise((resolve) => {
-    if (document.querySelector(selector)) {
-      return resolve(document.querySelector(selector));
-    }
-
-    const observer = new MutationObserver((mutations) => {
+    const observer = new MutationObserver((mutations, obs) => {
+      obs.disconnect();
       if (document.querySelector(selector)) {
-        resolve(document.querySelector(selector));
-        observer.disconnect();
+        return resolve(document.querySelector(selector));
       }
     });
 
@@ -70,6 +66,8 @@ export const openAccordionIfContainsAnchors = (anchor) => {
         comp.click();
         setTimeout(() => scrollToTarget(elm), 300);
       }
+    } else {
+      scrollToTarget(elm);
     }
   });
 

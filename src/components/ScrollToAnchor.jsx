@@ -7,7 +7,9 @@ const ScrollToAnchor = (props) => {
 
   React.useEffect(() => {
     const anchor = location?.hash || location?.pathname.hash;
-    if (anchor) openAccordionIfContainsAnchors(anchor);
+    if (anchor) {
+      openAccordionIfContainsAnchors(anchor);
+    }
   }, [location]);
 
   return null;
