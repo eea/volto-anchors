@@ -5,7 +5,6 @@ import { serializeNodes } from '@plone/volto-slate/editor/render';
 import { Link } from 'react-router-dom';
 import { getBlocks } from '@plone/volto/helpers/Blocks/Blocks';
 import linkSVG from '@plone/volto/icons/link.svg';
-
 import './less/slate-anchors.less';
 
 export const createSlateParagraph = (text) => {
@@ -51,7 +50,19 @@ export const scrollToTarget = (target, offsetHeight = 0) => {
   return;
 };
 
+const isValidSelector = (selector) => {
+  try {
+    document.createElement('div').querySelector(selector);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+
 export const openAccordionIfContainsAnchors = (anchor) => {
+  if (!isValidSelector(anchor)) {
+    return;
+  }
   waitForElm(anchor).then((elm) => {
     if (elm.closest('.accordion')) {
       const comp = elm.closest('.accordion')?.querySelector('.title');
