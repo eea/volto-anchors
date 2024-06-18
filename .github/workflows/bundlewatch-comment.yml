@@ -1,0 +1,17 @@
+name: Auto Comment
+on: [pull_request]
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: wow-actions/auto-comment@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          pullRequestOpened: |
+            👋 @{{ author }}
+            
+            To check bundle size on a frontend, write comment with:
+            > @eea-jenkins check bundle on FRONTEND-NAME
+            
+            Example:
+            > @eea-jenkins check bundle on eea-website-frontend           
