@@ -43,6 +43,7 @@ pipeline {
               sh """cat mrs.developer.json  | jq 'if ( has("'$GIT_NAME'") ) then .["'$GIT_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
               sh """mv temp mrs.developer.json"""
               sh """cat mrs.developer.json  | jq '.["'$GIT_NAME'"]' """
+              sh """if [ $(grep "eea/${GIT_NAME}.git:" mrs.developer.json | wc -l) -eq 0 ]; then exit 1; fi"""
               sh """yarn"""
               sh """make develop"""
               sh """make install"""
@@ -59,9 +60,16 @@ pipeline {
           }
         }
       }
+    post {
+      failure {
+        publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
+                      text: readFile(file: "${env.FRONTEND_NAME}/result.txt"), conclusion: "${currentBuild.currentResult}",
+                      detailsURL: "${env.BUILD_URL}display/redirect"
+
+        pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} FAILED\n\nCheck ${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")
+      }
     }
-
-
+   }
 
     stage('Release') {
       when {
