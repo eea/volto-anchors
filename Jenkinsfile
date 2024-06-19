@@ -37,8 +37,9 @@ pipeline {
             env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
             env.CI=false
             env.FRONTEND_NAME = (env.GITHUB_COMMENT =~ /@eea-jenkins check bundle on (\S+).*$/)[ 0 ][ 1 ]
-            sh "git clone https://github.com/eea/$FRONTEND_NAME.git"
-            dir($FRONTEND_NAME) {
+            
+            sh '''git clone https://github.com/eea/${FRONTEND_NAME}.git'''
+            dir(env.FRONTEND_NAME) {
 
               sh """cat mrs.developer.json  | jq 'if ( has("'$GITHUB_NAME'") ) then .["'$GITHUB_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
               sh """mv temp mrs.developer.json"""
