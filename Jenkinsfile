@@ -5,6 +5,11 @@ pipeline {
   tools {
     jdk 'Java17'
   }
+
+  triggers {
+        issueCommentTrigger('[^>]*@eea-jenkins.*check bundle on.*')
+  }
+
   environment {
     GIT_NAME = "volto-anchors"
     NAMESPACE = "@eeacms"
@@ -18,6 +23,44 @@ pipeline {
   }
 
   stages {
+
+
+   stage('Pull Request COMMENT') {
+      when {
+        not { environment name: 'CHANGE_ID', value: '' }
+        not { environment name: 'GITHUB_COMMENT', value: '' }
+      }
+     steps {
+        node(label: 'docker-big-jobs') {
+          script {
+            env.NODEJS_HOME = "${tool 'NodeJS'}"
+            env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
+            env.CI=false
+            env.FRONTEND_NAME = (env.GITHUB_COMMENT =~ /@eea-jenkins check bundle on (\S+).*$/)[ 0 ][ 1 ]
+            sh '''rm -rf ${FRONTEND_NAME}'''
+            sh '''git clone -b develop https://github.com/eea/${FRONTEND_NAME}.git'''
+            dir(env.FRONTEND_NAME) {
+              sh """cat mrs.developer.json  | jq 'if ( has("'$GIT_NAME'") ) then .["'$GIT_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
+              sh """mv temp mrs.developer.json"""
+              sh """cat mrs.developer.json  | jq '.["'$GIT_NAME'"]' """
+              sh """yarn"""
+              sh "make develop"
+              sh "make install"
+              sh "make build"
+              sh "set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json | tee checkresult.txt"
+              publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
+                        text: readFile(file: 'checkresult.txt'), conclusion: "${currentBuild.currentResult}",
+                        detailsURL: "${env.BUILD_URL}display/redirect"
+
+            }
+
+          }
+        }
+      }
+    }
+
+
+
     stage('Release') {
       when {
         allOf {
@@ -61,6 +104,7 @@ pipeline {
         anyOf {
           allOf {
             not { environment name: 'CHANGE_ID', value: '' }
+            environment name: 'GITHUB_COMMENT', value: ''
             environment name: 'CHANGE_TARGET', value: 'develop'
           }
           allOf {
@@ -347,6 +391,7 @@ pipeline {
         anyOf {
           allOf {
             not { environment name: 'CHANGE_ID', value: '' }
+            environment name: 'GITHUB_COMMENT', value: ''
             environment name: 'CHANGE_TARGET', value: 'develop'
             environment name: 'SKIP_TESTS', value: '' 
           }
@@ -377,6 +422,7 @@ pipeline {
         not {
           environment name: 'CHANGE_ID', value: ''
         }
+        environment name: 'GITHUB_COMMENT', value: ''
         environment name: 'CHANGE_TARGET', value: 'master'
       }
       steps {
