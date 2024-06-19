@@ -41,7 +41,7 @@ pipeline {
             sh '''git clone https://github.com/eea/${FRONTEND_NAME}.git'''
             dir(env.FRONTEND_NAME) {
 
-              sh """cat mrs.developer.json  | jq 'if ( has("'$GITHUB_NAME'") ) then .["'$GITHUB_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
+              sh """cat mrs.developer.json  | jq 'if ( has("'$GIT_NAME'") ) then .["'$GIT_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
               sh """mv temp mrs.developer.json"""
               sh """yarn"""
               sh "make develop"
