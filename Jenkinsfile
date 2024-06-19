@@ -37,7 +37,7 @@ pipeline {
             env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
             env.CI=false
             env.FRONTEND_NAME = (env.GITHUB_COMMENT =~ /@eea-jenkins check bundle on (\S+).*$/)[ 0 ][ 1 ]
-            
+            sh '''rm -rf ${FRONTEND_NAME}''' 
             sh '''git clone https://github.com/eea/${FRONTEND_NAME}.git'''
             dir(env.FRONTEND_NAME) {
 
