@@ -62,11 +62,13 @@ pipeline {
       }
     post {
       failure {
+       script {
         publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                       text: readFile(file: "${env.FRONTEND_NAME}/result.txt"), conclusion: "${currentBuild.currentResult}",
                       detailsURL: "${env.BUILD_URL}display/redirect"
 
         pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} FAILED\n\nCheck ${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")
+        } 
       }
     }
    }
