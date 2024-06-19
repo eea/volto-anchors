@@ -43,7 +43,7 @@ pipeline {
               sh """cat mrs.developer.json  | jq 'if ( has("'$GIT_NAME'") ) then .["'$GIT_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
               sh """mv temp mrs.developer.json"""
               sh """cat mrs.developer.json  | jq '.["'$GIT_NAME'"]' """
-              sh """if [ $(grep "eea/${GIT_NAME}.git:" mrs.developer.json | wc -l) -eq 0 ]; then exit 1; fi"""
+              sh """if [ $(grep "eea/"${GIT_NAME}".git:" mrs.developer.json | wc -l) -eq 0 ]; then exit 1; fi"""
               sh """yarn"""
               sh """make develop"""
               sh """make install"""
