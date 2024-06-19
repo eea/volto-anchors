@@ -38,16 +38,17 @@ pipeline {
             env.CI=false
             env.FRONTEND_NAME = (env.GITHUB_COMMENT =~ /@eea-jenkins check bundle on (\S+).*$/)[ 0 ][ 1 ]
             sh '''rm -rf ${FRONTEND_NAME}''' 
-            sh '''git clone https://github.com/eea/${FRONTEND_NAME}.git'''
+            sh '''git clone -b develop https://github.com/eea/${FRONTEND_NAME}.git'''
             dir(env.FRONTEND_NAME) {
-
+              
               sh """cat mrs.developer.json  | jq 'if ( has("'$GIT_NAME'") ) then .["'$GIT_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
               sh """mv temp mrs.developer.json"""
+              sh """cat mrs.developer.json  | jq '.["'$GIT_NAME'"]' """
               sh """yarn"""
               sh "make develop"
               sh "make install"
               sh "make build"
-              sh "yarn bundlewatch --config .bundlewatch.config.json | tee checkresult.txt"
+              sh "set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json | tee checkresult.txt"
               publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                         text: readFile(file: 'checkresult.txt'), conclusion: "${currentBuild.currentResult}",
                         detailsURL: "${env.BUILD_URL}display/redirect"
