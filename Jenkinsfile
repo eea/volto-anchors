@@ -44,11 +44,11 @@ pipeline {
               sh """mv temp mrs.developer.json"""
               sh """cat mrs.developer.json  | jq '.["'$GIT_NAME'"]' """
               sh """yarn"""
-              sh "make develop"
-              sh "make install"
-              sh "make build"
-              sh "set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json | tee checkresult.txt"
-              sh "cat checkresult.txt | grep -v "https://service.bundlewatch.io/results" > result.txt"
+              sh """make develop"""
+              sh """make install"""
+              sh """make build"""
+              sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json | tee checkresult.txt"""
+              sh """cat checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
               publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                         text: readFile(file: 'result.txt'), conclusion: "${currentBuild.currentResult}",
                         detailsURL: "${env.BUILD_URL}display/redirect"
