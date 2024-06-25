@@ -69,7 +69,12 @@ pipeline {
     post {
       failure {
        script {
-         sh """if [ -f ${FRONTEND_NAME}/checkresult.txt ] ; then cat ${FRONTEND_NAME}/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt; fi"""
+         try {
+           sh """cat ${FRONTEND_NAME}/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
+         }
+         catch {
+           sh """echo '\n\nPlease check Jenkins logs for detailed error message' >> result.txt"""
+         }
          publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                       text: readFile(file: "result.txt"), conclusion: "${currentBuild.currentResult}",
                       detailsURL: "${env.BUILD_URL}display/redirect"
