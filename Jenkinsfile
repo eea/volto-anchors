@@ -44,25 +44,27 @@ pipeline {
               sh '''git clone -b develop https://github.com/eea/${FRONTEND_NAME}.git'''
             }
             catch (Exception e) {
-              sh '''echo "Error cloning develop branch on https://github.com/eea/${FRONTEND_NAME}.git" > result.txt'''
-              exit 1
+              pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} SKIPPED\n\nError cloning develop branch on https://github.com/eea/${FRONTEND_NAME}.git\n\nPlease check if the frontend name is correct and try again\n\nCheck ${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")
+              exit 0
             }
             dir(env.FRONTEND_NAME) {
               sh """cat mrs.developer.json  | jq 'if ( has("'$GIT_NAME'") ) then .["'$GIT_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
               sh """mv temp mrs.developer.json"""
               sh """cat mrs.developer.json  | jq '.["'$GIT_NAME'"]' """
-              sh '''if [ $(grep "eea/"${GIT_NAME}".git" mrs.developer.json | wc -l) -eq 0 ]; then echo "Volto addon does not exist in mrs.developer.json on develop branch on https://github.com/eea/${FRONTEND_NAME}.git" > ../result.txt; exit 1; fi'''
+              sh '''if [ $(grep "eea/"${GIT_NAME}".git" mrs.developer.json | wc -l) -eq 0 ]; then exit 1; fi'''
               sh """yarn"""
               sh """make develop"""
               sh """make install"""
               sh """make build"""
               sh """sed -i "s/270kB/50kB/" .bundlewatch.config.json"""
-              sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json | tee checkresult.txt"""
-              sh """cat checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
+              sh """mkdir -p /tmp/$GIT_NAME/$BUILD_NUMBER"""
+              sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json | tee /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt"""
+              sh """cat /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
+              
               publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                         text: readFile(file: 'result.txt'), conclusion: "${currentBuild.currentResult}",
                         detailsURL: "${env.BUILD_URL}display/redirect"
-
+              pullRequest.comment("### :heavy_check_mark: Bundlewatch passed on ${FRONTEND_NAME}:\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
             }
 
           }
@@ -72,19 +74,15 @@ pipeline {
       failure {
        script {
          try {
-           sh """pwd"""
-           sh """ls -ltr *"""
-           sh """find ../ -name checkresult.txt"""
-           sh """cat ${FRONTEND_NAME}/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
+           sh """cat /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
          }
          catch (Exception e) {
-           sh """echo '\n\nPlease check Jenkins logs - ${env.BUILD_URL}display/redirect for detailed error message' >> result.txt"""
+           sh """echo 'Bundlewatch could not run with $GIT_NAME on $FRONTEND_NAME\n\nPlease check Jenkins logs - ${env.BUILD_URL}display/redirect for detailed error message' > result.txt"""
          }
          publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                       text: readFile(file: "result.txt"), conclusion: "${currentBuild.currentResult}",
                       detailsURL: "${env.BUILD_URL}display/redirect"
-
-        pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} FAILED\n\nCheck ${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")
+         pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} FAILED\n\nCheck ${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")     
         } 
       }
     }
