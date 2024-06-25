@@ -72,7 +72,7 @@ pipeline {
          try {
            sh """cat ${FRONTEND_NAME}/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
          }
-         catch {
+         catch (Exception e) {
            sh """echo '\n\nPlease check Jenkins logs for detailed error message' >> result.txt"""
          }
          publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
