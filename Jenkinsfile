@@ -38,6 +38,8 @@ pipeline {
             env.CI=false
             env.FRONTEND_NAME = (env.GITHUB_COMMENT =~ /@eea-jenkins check bundle on (\S+).*$/)[ 0 ][ 1 ]
             sh '''rm -rf ${FRONTEND_NAME}'''
+            sh '''pwd'''
+            sh '''ls -ltr *'''
             try {
               sh '''git clone -b develop https://github.com/eea/${FRONTEND_NAME}.git'''
             }
@@ -71,7 +73,8 @@ pipeline {
        script {
          try {
            sh """pwd"""
-           sh """find . -name checkresult.txt"""
+           sh """ls -ltr *"""
+           sh """find ../ -name checkresult.txt"""
            sh """cat ${FRONTEND_NAME}/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
          }
          catch (Exception e) {
