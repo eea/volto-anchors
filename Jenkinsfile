@@ -38,15 +38,7 @@ pipeline {
             env.CI=false
             env.FRONTEND_NAME = (env.GITHUB_COMMENT =~ /@eea-jenkins check bundle on (\S+).*$/)[ 0 ][ 1 ]
             sh '''rm -rf ${FRONTEND_NAME}'''
-            sh '''pwd'''
-            sh '''ls -ltr *'''
-            try {
-              sh '''git clone -b develop https://github.com/eea/${FRONTEND_NAME}.git'''
-            }
-            catch (Exception e) {
-              pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} SKIPPED\n\nError cloning develop branch on https://github.com/eea/${FRONTEND_NAME}.git\n\nPlease check if the frontend name is correct and try again\n\nCheck ${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")
-              exit 0
-            }
+            sh '''git clone -b develop https://github.com/eea/${FRONTEND_NAME}.git'''
             dir(env.FRONTEND_NAME) {
               sh """cat mrs.developer.json  | jq 'if ( has("'$GIT_NAME'") ) then .["'$GIT_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
               sh """mv temp mrs.developer.json"""
@@ -75,15 +67,15 @@ pipeline {
        script {
          try {
            sh """cat /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
+           publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
+                         text: readFile(file: "result.txt"), conclusion: "${currentBuild.currentResult}",
+                         detailsURL: "${env.BUILD_URL}display/redirect"
+         
          }
          catch (Exception e) {
-           sh """echo 'Bundlewatch could not run with $GIT_NAME on $FRONTEND_NAME\n\nPlease check Jenkins logs - ${env.BUILD_URL}display/redirect for detailed error message' > result.txt"""
+           pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} could not run\n\nCheck if frontend name ${FRONTEND_NAME} is correct, check if $GIT_NAME is present in mrs.developer.json and try again\n\n${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")     
          }
-         publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
-                      text: readFile(file: "result.txt"), conclusion: "${currentBuild.currentResult}",
-                      detailsURL: "${env.BUILD_URL}display/redirect"
-         pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} FAILED\n\nCheck ${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")     
-        } 
+         } 
       }
     }
    }
