@@ -50,7 +50,7 @@ pipeline {
               sh """make build"""
               sh """sed -i "s/270kB/50kB/" .bundlewatch.config.json"""
               sh """mkdir -p /tmp/$GIT_NAME/$BUILD_NUMBER"""
-              sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json | tee /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt"""
+              sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt"""
               sh """cat /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
               
               publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
