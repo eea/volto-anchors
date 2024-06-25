@@ -63,7 +63,8 @@ pipeline {
     post {
       failure {
        script {
-        publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
+         sh """cat ${FRONTEND_NAME}/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > ${FRONTEND_NAME}/result.txt"""
+         publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                       text: readFile(file: "${env.FRONTEND_NAME}/result.txt"), conclusion: "${currentBuild.currentResult}",
                       detailsURL: "${env.BUILD_URL}display/redirect"
 
