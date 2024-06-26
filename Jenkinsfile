@@ -30,9 +30,11 @@ pipeline {
         not { environment name: 'CHANGE_ID', value: '' }
         not { environment name: 'GITHUB_COMMENT', value: '' }
       }
+      agent {
+        node { label 'docker-big-jobs' }
+      }
      steps {
-        node(label: 'docker-big-jobs') {
-          script {
+        script {
             env.NODEJS_HOME = "${tool 'NodeJS'}"
             env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
             env.CI=false
@@ -53,15 +55,14 @@ pipeline {
               sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt"""
               sh """cat /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
               
-              publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bunde size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
+              publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                         text: readFile(file: 'result.txt'), conclusion: "${currentBuild.currentResult}",
                         detailsURL: "${env.BUILD_URL}display/redirect"
               pullRequest.comment("### :heavy_check_mark: Bundlewatch passed on ${FRONTEND_NAME}:\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
             }
 
           }
-        }
-      }
+    }
     post {
       failure {
        script {
