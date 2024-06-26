@@ -52,13 +52,13 @@ pipeline {
               sh """make build"""
               sh """sed -i "s/270kB/50kB/" .bundlewatch.config.json"""
               sh """mkdir -p /tmp/$GIT_NAME/$BUILD_NUMBER"""
-              sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt"""
-              sh """cat /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
+              sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult.txt"""
+              sh """grep -v 'https://service.bundlewatch.io/results' checkresult.txt > result.txt"""
               
               publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                         text: readFile(file: 'result.txt'), conclusion: "${currentBuild.currentResult}",
                         detailsURL: "${env.BUILD_URL}display/redirect"
-              pullRequest.comment("### :heavy_check_mark: Bundlewatch passed on ${FRONTEND_NAME}:\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
+              pullRequest.comment("### :heavy_check_mark: Bundlewatch check passed on ${FRONTEND_NAME}:\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
             }
 
           }
@@ -67,14 +67,14 @@ pipeline {
       failure {
        script {
          try {
-           sh """cat /tmp/$GIT_NAME/$BUILD_NUMBER/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
+           sh """cat $FRONTEND_NAME/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
            publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                          text: readFile(file: "result.txt"), conclusion: "${currentBuild.currentResult}",
                          detailsURL: "${env.BUILD_URL}display/redirect"
          
          }
          catch (Exception e) {
-           pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} could not run\n\nCheck if frontend name ${FRONTEND_NAME} is correct, check if $GIT_NAME is present in mrs.developer.json and try again\n\n${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")     
+           pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} could not run\n\nCheck if frontend name ${FRONTEND_NAME} is written correctly, then check if $GIT_NAME is present in mrs.developer.json and try again\n\n${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")     
          }
          } 
       }
