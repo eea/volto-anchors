@@ -51,7 +51,7 @@ pipeline {
               sh """make install"""
               sh """make build"""
               sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult.txt"""
-              sh """export NEW_SIZE=`du build/public/static/js/ | awk '{print ${1}}'`"""
+              sh '''export NEW_SIZE=`du build/public/static/js/ | awk '{print $1}'` '''
               sh """cat mrs.developer.json  | jq '.[].branch="master"' > temp"""
               sh """mv temp mrs.developer.json"""
               sh """yarn"""
@@ -60,10 +60,10 @@ pipeline {
               sh """make build"""
               sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult2.txt"""
               sh '''export OLD_SIZE=`du build/public/static/js/ | awk '{print $1}'`'''
-              sh """diff checkresult.txt checkresult2.txt"""
               sh """echo "$NEW_SIZE $OLD_SIZE" """
-
               sh """grep -v 'https://service.bundlewatch.io/results' checkresult.txt > result.txt"""
+              sh """grep -v 'https://service.bundlewatch.io/results' checkresult2.txt > result2.txt"""
+              sh """diff result.txt result2.txt | grep static"""
               
               publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                         text: readFile(file: 'result.txt'), conclusion: "${currentBuild.currentResult}",
