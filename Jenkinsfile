@@ -59,7 +59,7 @@ pipeline {
               sh """make install"""
               sh """make build"""
               sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult2.txt"""
-              sh """export OLD_SIZE=$(du build/public/static/js/ | awk '{print $1}')
+              sh """export OLD_SIZE=$(du build/public/static/js/ | awk '{print $1}')"""
               sh """diff checkresult.txt checkresult2.txt"""
               sh """echo "$NEW_SIZE $OLD_SIZE" """
 
