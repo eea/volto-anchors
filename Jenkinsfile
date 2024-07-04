@@ -60,7 +60,7 @@ pipeline {
               sh """make build"""
               sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult2.txt"""
               sh '''export OLD_SIZE=`du build/public/static/js/ | awk '{print $1}'`'''
-              sh """echo "$NEW_SIZE $OLD_SIZE" """
+              sh '''echo "$NEW_SIZE $OLD_SIZE" '''
               sh """grep -v 'https://service.bundlewatch.io/results' checkresult.txt > result.txt"""
               sh """grep -v 'https://service.bundlewatch.io/results' checkresult2.txt > result2.txt"""
               sh """diff result.txt result2.txt | grep static"""
