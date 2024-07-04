@@ -51,24 +51,22 @@ pipeline {
               sh """make install"""
               sh """make build"""
               sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult.txt"""
-              sh '''export NEW_SIZE=`du build/public/static/js/ | awk '{print $1}'` '''
+              sh '''du build/public/static/js/ | awk '{print $1}' > new_size '''
               sh """cat mrs.developer.json  | jq '.[].branch="master"' > temp"""
               sh """mv temp mrs.developer.json"""
-              sh """yarn"""
               sh """make develop"""
               sh """make install"""
               sh """make build"""
+              sh '''du build/public/static/js/ | awk '{print $1}' > old_size '''
               sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult2.txt"""
-              sh '''export OLD_SIZE=`du build/public/static/js/ | awk '{print $1}'`'''
-              sh '''echo "$NEW_SIZE $OLD_SIZE" '''
               sh """grep -v 'https://service.bundlewatch.io/results' checkresult.txt > result.txt"""
               sh """grep -v 'https://service.bundlewatch.io/results' checkresult2.txt > result2.txt"""
               sh """diff result.txt result2.txt | grep static"""
-              
+              env.difference =  readFile(file: 'new_size').toInteger() - readFile(file: 'old_size').toInteger()          
               publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                         text: readFile(file: 'result.txt'), conclusion: "${currentBuild.currentResult}",
                         detailsURL: "${env.BUILD_URL}display/redirect"
-              pullRequest.comment("### :heavy_check_mark: Bundlewatch check passed on ${FRONTEND_NAME}:\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
+              pullRequest.comment("### :heavy_check_mark: Bundlewatch check passed on ${FRONTEND_NAME}:\nDifference $difference\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
             }
 
           }
