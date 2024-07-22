@@ -50,23 +50,26 @@ pipeline {
               sh """make develop"""
               sh """make install"""
               sh """make build"""
-              sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult.txt"""
-              sh '''du build/public/static/js/ | awk '{print $1}' > new_size '''
-              sh """cat mrs.developer.json  | jq '.[].branch="master"' > temp"""
-              sh """mv temp mrs.developer.json"""
-              sh """make develop"""
-              sh """make install"""
-              sh """make build"""
-              sh '''du build/public/static/js/ | awk '{print $1}' > old_size '''
-              sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult2.txt"""
-              sh """grep -v 'https://service.bundlewatch.io/results' checkresult.txt > result.txt"""
-              sh """grep -v 'https://service.bundlewatch.io/results' checkresult2.txt > result2.txt"""
-              sh """diff result.txt result2.txt | grep static"""
+              try {
+                sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult.txt"""
+              finally {
+                sh '''du build/public/static/js/ | awk '{print $1}' > new_size '''
+                sh """cat mrs.developer.json  | jq '.[].branch="master"' > temp"""
+                sh """mv temp mrs.developer.json"""
+                sh """make develop"""
+                sh """make install"""
+                sh """make build"""
+                sh '''du build/public/static/js/ | awk '{print $1}' > old_size '''
+                sh """yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult2.txt"""
+                sh """grep -v 'https://service.bundlewatch.io/results' checkresult.txt > result.txt"""
+                sh """grep -v 'https://service.bundlewatch.io/results' checkresult2.txt > result2.txt"""
+                sh """diff result.txt result2.txt | grep static > diffresult.txt"""
+              }
               env.difference =  readFile(file: 'new_size').toInteger() - readFile(file: 'old_size').toInteger()          
               publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
-                        text: readFile(file: 'result.txt'), conclusion: "${currentBuild.currentResult}",
+                        text: readFile(file: 'diffresult.txt'), conclusion: "${currentBuild.currentResult}",
                         detailsURL: "${env.BUILD_URL}display/redirect"
-              pullRequest.comment("### :heavy_check_mark: Bundlewatch check passed on ${FRONTEND_NAME}:\nDifference $difference\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
+              pullRequest.comment("### :heavy_check_mark: Bundlewatch check passed on ${FRONTEND_NAME}:\nTotal size difference $difference\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
             }
 
           }
@@ -75,9 +78,12 @@ pipeline {
       failure {
        script {
          try {
-           sh """cat $FRONTEND_NAME/checkresult.txt | grep -v 'https://service.bundlewatch.io/results' > result.txt"""
+           sh """cat $FRONTEND_NAME/diffresult.txt"""
+
+           pullRequest.comment("### :x: Bundlewatch check failed on ${FRONTEND_NAME}:\nTotal size difference $difference\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
+
            publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
-                         text: readFile(file: "result.txt"), conclusion: "${currentBuild.currentResult}",
+                         text: readFile(file: "diffresult.txt"), conclusion: "${currentBuild.currentResult}",
                          detailsURL: "${env.BUILD_URL}display/redirect"
          
          }
@@ -134,6 +140,7 @@ pipeline {
             not { environment name: 'CHANGE_ID', value: '' }
             environment name: 'GITHUB_COMMENT', value: ''
             environment name: 'CHANGE_TARGET', value: 'develop'
+            environment name: 'GITHUB_COMMENT', value: ''
           }
           allOf {
             environment name: 'CHANGE_ID', value: ''
