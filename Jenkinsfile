@@ -55,7 +55,7 @@ pipeline {
               }
               finally {
                 sh '''du build/public/static/js/ | awk '{print $1}' > new_size '''
-                sh """cat mrs.developer.json  | jq '.[].branch="master"' > temp"""
+                sh """cat mrs.developer.json  | jq '.[].branch="develop"' > temp"""
                 sh """mv temp mrs.developer.json"""
                 sh """make develop"""
                 sh """make install"""
