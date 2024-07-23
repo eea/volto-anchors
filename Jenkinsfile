@@ -66,7 +66,10 @@ pipeline {
                 sh """grep -v 'https://service.bundlewatch.io/results' checkresult2.txt > result2.txt"""
                 sh """diff result.txt result2.txt | grep static > diffresult.txt"""
               }
-              env.difference =  readFile(file: 'new_size').toInteger() - readFile(file: 'old_size').toInteger()          
+              env.difference =  readFile(file: 'new_size').toInteger() - readFile(file: 'old_size').toInteger()      
+              if ( env.difference == 0 ) {
+                sh """cp result.txt diffresult.txt"""
+              }
               publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
                         text: readFile(file: 'diffresult.txt'), conclusion: "${currentBuild.currentResult}",
                         detailsURL: "${env.BUILD_URL}display/redirect"
