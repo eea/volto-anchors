@@ -52,6 +52,7 @@ pipeline {
               sh """make build"""
               try {
                 sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult.txt"""
+              }
               finally {
                 sh '''du build/public/static/js/ | awk '{print $1}' > new_size '''
                 sh """cat mrs.developer.json  | jq '.[].branch="master"' > temp"""
