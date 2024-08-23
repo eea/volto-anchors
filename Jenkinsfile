@@ -5,6 +5,11 @@ pipeline {
   tools {
     jdk 'Java17'
   }
+
+  triggers {
+        issueCommentTrigger('[^>]*@eea-jenkins.*check bundle on.*')
+  }
+
   environment {
     GIT_NAME = "volto-anchors"
     NAMESPACE = "@eeacms"
@@ -18,6 +23,82 @@ pipeline {
   }
 
   stages {
+
+
+   stage('Pull Request COMMENT') {
+      when {
+        not { environment name: 'CHANGE_ID', value: '' }
+        not { environment name: 'GITHUB_COMMENT', value: '' }
+      }
+      agent {
+        node { label 'docker-big-jobs' }
+      }
+     steps {
+        script {
+            env.NODEJS_HOME = "${tool 'NodeJS'}"
+            env.PATH="${env.NODEJS_HOME}/bin:${env.PATH}"
+            env.CI=false
+            env.FRONTEND_NAME = (env.GITHUB_COMMENT =~ /@eea-jenkins check bundle on (\S+).*$/)[ 0 ][ 1 ]
+            sh '''rm -rf ${FRONTEND_NAME}'''
+            sh '''git clone -b develop https://github.com/eea/${FRONTEND_NAME}.git'''
+            dir(env.FRONTEND_NAME) {
+              sh """cat mrs.developer.json  | jq '.[].branch="master"' | jq 'if ( has("'$GIT_NAME'") ) then .["'$GIT_NAME'"].branch = "'$CHANGE_BRANCH'" else . end' > temp"""
+              sh """mv temp mrs.developer.json"""
+              sh """cat mrs.developer.json  | jq '.["'$GIT_NAME'"]' """
+              sh '''if [ $(grep "eea/"${GIT_NAME}".git" mrs.developer.json | wc -l) -eq 0 ]; then exit 1; fi'''
+              sh """yarn"""
+              sh """make develop"""
+              sh """make install"""
+              sh """make build"""
+              try {
+                sh """set -o pipefail; yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult.txt"""
+              }
+              finally {
+                sh '''du build/public/static/js/ | awk '{print $1}' > new_size '''
+                sh """cat mrs.developer.json  | jq '.[].branch="develop"' > temp"""
+                sh """mv temp mrs.developer.json"""
+                sh """make develop"""
+                sh """make install"""
+                sh """make build"""
+                sh '''du build/public/static/js/ | awk '{print $1}' > old_size '''
+                sh """yarn bundlewatch --config .bundlewatch.config.json 2>&1 | tee checkresult2.txt"""
+                sh """grep -v 'https://service.bundlewatch.io/results' checkresult.txt > result.txt"""
+                sh """grep -v 'https://service.bundlewatch.io/results' checkresult2.txt > result2.txt"""
+                sh """diff result.txt result2.txt | grep static > diffresult.txt"""
+              }
+              env.difference =  readFile(file: 'new_size').toInteger() - readFile(file: 'old_size').toInteger()      
+              if ( env.difference == 0 ) {
+                sh """cp result.txt diffresult.txt"""
+              }
+              publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
+                        text: readFile(file: 'diffresult.txt'), conclusion: "${currentBuild.currentResult}",
+                        detailsURL: "${env.BUILD_URL}display/redirect"
+              pullRequest.comment("### :heavy_check_mark: Bundlewatch check passed on ${FRONTEND_NAME}:\nTotal size difference $difference\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
+            }
+
+          }
+    }
+    post {
+      failure {
+       script {
+         try {
+           sh """cat $FRONTEND_NAME/diffresult.txt"""
+
+           pullRequest.comment("### :x: Bundlewatch check failed on ${FRONTEND_NAME}:\nTotal size difference $difference\n${BUILD_URL}${GIT_NAME}/\n\n:rocket: @${GITHUB_COMMENT_AUTHOR}")
+
+           publishChecks name: "Bundlewatch on ${env.FRONTEND_NAME}", title: "Bundle size check on ${env.FRONTEND_NAME}", summary: "Result of bundlewatch run on ${env.FRONTEND_NAME}",
+                         text: readFile(file: "diffresult.txt"), conclusion: "${currentBuild.currentResult}",
+                         detailsURL: "${env.BUILD_URL}display/redirect"
+         
+         }
+         catch (Exception e) {
+           pullRequest.comment("### :x: Bundlewatch check job on ${FRONTEND_NAME} could not run\n\nCheck if frontend name ${FRONTEND_NAME} is written correctly, then check if $GIT_NAME is present in mrs.developer.json and try again\n\n${BUILD_URL} for details\n\n:fire: @${GITHUB_COMMENT_AUTHOR}")     
+         }
+         } 
+      }
+    }
+   }
+
     stage('Release') {
       when {
         allOf {
@@ -61,7 +142,9 @@ pipeline {
         anyOf {
           allOf {
             not { environment name: 'CHANGE_ID', value: '' }
+            environment name: 'GITHUB_COMMENT', value: ''
             environment name: 'CHANGE_TARGET', value: 'develop'
+            environment name: 'GITHUB_COMMENT', value: ''
           }
           allOf {
             environment name: 'CHANGE_ID', value: ''
@@ -347,6 +430,7 @@ pipeline {
         anyOf {
           allOf {
             not { environment name: 'CHANGE_ID', value: '' }
+            environment name: 'GITHUB_COMMENT', value: ''
             environment name: 'CHANGE_TARGET', value: 'develop'
             environment name: 'SKIP_TESTS', value: '' 
           }
@@ -377,6 +461,7 @@ pipeline {
         not {
           environment name: 'CHANGE_ID', value: ''
         }
+        environment name: 'GITHUB_COMMENT', value: ''
         environment name: 'CHANGE_TARGET', value: 'master'
       }
       steps {
@@ -395,8 +480,6 @@ pipeline {
   post {
     always {
       cleanWs(cleanWhenAborted: true, cleanWhenFailure: true, cleanWhenNotBuilt: true, cleanWhenSuccess: true, cleanWhenUnstable: true, deleteDirs: true)
-    }
-    changed {
       script {
         def details = """<h1>${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - ${currentBuild.currentResult}</h1>
                          <p>Check console output at <a href="${env.BUILD_URL}/display/redirect">${env.JOB_BASE_NAME} - #${env.BUILD_NUMBER}</a></p>
