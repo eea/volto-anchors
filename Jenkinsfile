@@ -244,7 +244,7 @@ pipeline {
           else {
             env.sonarParams = " -Dsonar.branch.name=${env.BRANCH_NAME}"
           }
-          withSonarQubeEnv('SonarqubePre') {
+          withSonarQubeEnv('Sonarqube') {
             sh '''sed -i "s#/app/src/addons/${GIT_NAME}/##g" xunit-reports/coverage/lcov.info'''
             sh '''sed -i "s#src/addons/${GIT_NAME}/##g" xunit-reports/coverage/lcov.info'''
             sh "export PATH=${scannerHome}/bin:${nodeJS}/bin:$PATH; sonar-scanner -Dsonar.javascript.lcov.reportPaths=./xunit-reports/coverage/lcov.info,./cypress-coverage/coverage/lcov.info -Dsonar.sources=./src -Dsonar.projectKey=$GIT_NAME -Dsonar.projectVersion=$BRANCH_NAME-$BUILD_NUMBER"
@@ -365,7 +365,7 @@ pipeline {
         script {
           sh '''echo "Error" > checkresult.txt'''
           catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-            sh '''set -o pipefail; docker run -i --rm --pull always --name="$IMAGE_NAME-gitflow-sn" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_NAME="$GIT_NAME" -e SONAR_HOST_URL="https://sonarqube.01dev.eea.europa.eu/" eeacms/gitflow /checkSonarqubemasterV2.sh | grep -v "Found script" | tee checkresult.txt'''
+            sh '''set -o pipefail; docker run -i --rm --pull always --name="$IMAGE_NAME-gitflow-sn" -e GIT_BRANCH="$BRANCH_NAME" -e GIT_NAME="$GIT_NAME" eeacms/gitflow /checkSonarqubemasterV2.sh | grep -v "Found script" | tee checkresult.txt'''
           }
 
           publishChecks name: 'SonarQube', title: 'Sonarqube Code Quality Check', summary: 'Quality check on the SonarQube metrics from branch develop, comparing it with the ones from master branch. No bugs are allowed',
