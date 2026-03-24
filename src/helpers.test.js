@@ -2,7 +2,7 @@ import { isArray } from 'lodash';
 import config from '@plone/volto/registry';
 import { serializeNodes } from '@plone/volto-slate/editor/render';
 import * as helpers from './helpers';
-import '@testing-library/jest-dom/extend-expect';
+import '@testing-library/jest-dom';
 import configureStore from 'redux-mock-store';
 import { Provider } from 'react-intl-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
