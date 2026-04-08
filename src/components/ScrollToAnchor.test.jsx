@@ -7,7 +7,7 @@ import { openAccordionIfContainsAnchors } from '@eeacms/volto-anchors/helpers';
 
 const mockStore = configureStore();
 
-jest.mock('../helpers', () => ({
+jest.mock('@eeacms/volto-anchors/helpers', () => ({
   openAccordionIfContainsAnchors: jest.fn(),
 }));
 
