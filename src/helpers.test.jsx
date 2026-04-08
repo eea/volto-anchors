@@ -1,4 +1,4 @@
-import { isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 import config from '@plone/volto/registry';
 import { serializeNodes } from '@plone/volto-slate/editor/render';
 import * as helpers from './helpers';

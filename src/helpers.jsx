@@ -1,4 +1,4 @@
-import { isArray } from 'lodash';
+import isArray from 'lodash/isArray';
 import Slugger from 'github-slugger';
 import config from '@plone/volto/registry';
 import { serializeNodes } from '@plone/volto-slate/editor/render';
