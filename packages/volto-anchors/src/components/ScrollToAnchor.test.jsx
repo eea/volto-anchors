@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import React from 'react';
 import { Provider } from 'react-intl-redux';
 import configureStore from 'redux-mock-store';
@@ -7,8 +8,8 @@ import { openAccordionIfContainsAnchors } from '@eeacms/volto-anchors/helpers';
 
 const mockStore = configureStore();
 
-jest.mock('@eeacms/volto-anchors/helpers', () => ({
-  openAccordionIfContainsAnchors: jest.fn(),
+vi.mock('@eeacms/volto-anchors/helpers', () => ({
+  openAccordionIfContainsAnchors: vi.fn(),
 }));
 
 describe('ScrollToAnchor', () => {
@@ -28,7 +29,7 @@ describe('ScrollToAnchor', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call openAccordionIfContainsAnchors with the correct hash', () => {

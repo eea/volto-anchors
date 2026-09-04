@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import isArray from 'lodash/isArray';
 import config from '@plone/volto/registry';
 import { serializeNodes } from '@plone/volto-slate/editor/render';
@@ -8,6 +9,16 @@ import { Provider } from 'react-intl-redux';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { render } from '@testing-library/react';
 
+vi.mock('@plone/volto/registry', () => ({
+  default: {
+    settings: {
+      slate: {
+        defaultValue: vi.fn(() => [{ children: [{ text: '' }] }]),
+      },
+    },
+  },
+}));
+
 const mockStore = configureStore();
 
 const store = mockStore({
@@ -17,19 +28,20 @@ const store = mockStore({
   },
 });
 
-jest.mock('@plone/volto-slate/editor/render', () => ({
-  serializeNodes: jest.fn(),
+vi.mock('@plone/volto-slate/editor/render', () => ({
+  serializeNodes: vi.fn(),
 }));
 
 describe('createSlateParagraph', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should return default value when input is not an array', () => {
     const input = 'test';
     const slate = helpers.createSlateParagraph(input);
-    expect(slate).toEqual(config.settings.slate.defaultValue('test'));
+    expect(slate).toEqual([{ children: [{ text: '' }] }]);
+    expect(config.settings.slate.defaultValue).toHaveBeenCalledWith();
   });
 
   it('should return input when input is an array', () => {
@@ -41,7 +53,7 @@ describe('createSlateParagraph', () => {
 
 describe('serializeText', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it('should return the text when it is not an array', () => {
@@ -74,15 +86,15 @@ describe('waitForElm', () => {
 
   beforeEach(() => {
     // Reset the document.querySelector mock
-    document.querySelector = jest.fn();
+    document.querySelector = vi.fn();
 
     // Mock the MutationObserver
     mockObserver = {
-      observe: jest.fn(),
-      disconnect: jest.fn(),
+      observe: vi.fn(),
+      disconnect: vi.fn(),
     };
 
-    global.MutationObserver = jest.fn((callback) => {
+    global.MutationObserver = vi.fn((callback) => {
       mockObserver.callback = callback;
       return mockObserver;
     });
@@ -115,7 +127,7 @@ describe('waitForElm', () => {
   it('should resolve and stop observing when the element is added to the DOM', async () => {
     const mockElement = {};
 
-    document.querySelector = jest.fn((selector) =>
+    document.querySelector = vi.fn((selector) =>
       selector === '.test' ? mockElement : null,
     );
     // we need to mock the querySelector twice, because the first time it will return null (not added to the DOM)
@@ -136,14 +148,14 @@ describe('waitForElm', () => {
 
 describe('scrollToTarget', () => {
   it('should call window.scrollTo with the correct arguments', () => {
-    window.scrollTo = jest.fn();
+    window.scrollTo = vi.fn();
 
     // Create a mock element and mock its getBoundingClientRect function
     const mockElement = {
-      getBoundingClientRect: jest.fn(),
+      getBoundingClientRect: vi.fn(),
     };
     // Mock the return values of getBoundingClientRect
-    document.body.getBoundingClientRect = jest.fn(() => ({ top: 100 }));
+    document.body.getBoundingClientRect = vi.fn(() => ({ top: 100 }));
     mockElement.getBoundingClientRect.mockReturnValue({ top: 200 });
 
     // Call our function
@@ -183,7 +195,7 @@ describe('visitBlocks', () => {
       },
     };
 
-    const callback = jest.fn();
+    const callback = vi.fn();
     helpers.visitBlocks(content, callback);
     expect(callback).toHaveBeenNthCalledWith(1, [
       2,
