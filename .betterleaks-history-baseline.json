@@ -1,0 +1,109 @@
+[
+ {
+  "RuleID": "env-short-secret-assignment",
+  "Description": "Uppercase env-style PASS/TOKEN/SECRET assignment",
+  "StartLine": 36,
+  "EndLine": 36,
+  "StartColumn": 11,
+  "EndColumn": 49,
+  "Match": "GITHUB_TOKEN=REDACTED",
+  "Secret": "REDACTED",
+  "Attributes": {
+   "git.author_email": "nileshgulia@gmail.com",
+   "git.author_name": "Nilesh",
+   "git.date": "2023-01-30T14:40:18Z",
+   "git.message": "Initial commit",
+   "git.platform": "github",
+   "git.remote_url": "https://github.com/eea/volto-anchors",
+   "git.sha": "14ff046481dbe87aa3174682175f1de64f8b98e0",
+   "path": "RELEASE.md",
+   "resource": "git.patch_content",
+   "url": "https://github.com/eea/volto-anchors/blob/14ff046481dbe87aa3174682175f1de64f8b98e0/RELEASE.md?plain=1#L36"
+  },
+  "Tags": [
+   "env",
+   "literal-secret",
+   "env",
+   "literal-secret"
+  ],
+  "Fingerprint": "14ff046481dbe87aa3174682175f1de64f8b98e0:RELEASE.md:env-short-secret-assignment:36",
+  "File": "RELEASE.md",
+  "SymlinkFile": "",
+  "Commit": "14ff046481dbe87aa3174682175f1de64f8b98e0",
+  "Entropy": 0.23519339,
+  "Author": "Nilesh",
+  "Email": "nileshgulia@gmail.com",
+  "Date": "2023-01-30T14:40:18Z",
+  "Message": "Initial commit"
+ },
+ {
+  "RuleID": "secret-literal-assignment",
+  "Description": "Secret-like literal assignment in source, YAML, env and config files",
+  "StartLine": 11,
+  "EndLine": 11,
+  "StartColumn": 3,
+  "EndColumn": 20,
+  "Match": "password = 'REDACTED'",
+  "Secret": "REDACTED",
+  "Attributes": {
+   "git.author_email": "nileshgulia@gmail.com",
+   "git.author_name": "Nilesh",
+   "git.date": "2023-01-30T14:40:18Z",
+   "git.message": "Initial commit",
+   "git.platform": "github",
+   "git.remote_url": "https://github.com/eea/volto-anchors",
+   "git.sha": "14ff046481dbe87aa3174682175f1de64f8b98e0",
+   "path": "cypress/support/commands.js",
+   "resource": "git.patch_content",
+   "url": "https://github.com/eea/volto-anchors/blob/14ff046481dbe87aa3174682175f1de64f8b98e0/cypress/support/commands.js#L11"
+  },
+  "Tags": [
+   "literal-secret",
+   "literal-secret"
+  ],
+  "Fingerprint": "14ff046481dbe87aa3174682175f1de64f8b98e0:cypress/support/commands.js:secret-literal-assignment:11",
+  "File": "cypress/support/commands.js",
+  "SymlinkFile": "",
+  "Commit": "14ff046481dbe87aa3174682175f1de64f8b98e0",
+  "Entropy": 2.321928,
+  "Author": "Nilesh",
+  "Email": "nileshgulia@gmail.com",
+  "Date": "2023-01-30T14:40:18Z",
+  "Message": "Initial commit"
+ },
+ {
+  "RuleID": "secret-literal-assignment",
+  "Description": "Secret-like literal assignment in source, YAML, env and config files",
+  "StartLine": 18,
+  "EndLine": 18,
+  "StartColumn": 28,
+  "EndColumn": 46,
+  "Match": "password: REDACTED",
+  "Secret": "REDACTED",
+  "Attributes": {
+   "git.author_email": "nileshgulia@gmail.com",
+   "git.author_name": "Nilesh",
+   "git.date": "2023-01-30T14:40:18Z",
+   "git.message": "Initial commit",
+   "git.platform": "github",
+   "git.remote_url": "https://github.com/eea/volto-anchors",
+   "git.sha": "14ff046481dbe87aa3174682175f1de64f8b98e0",
+   "path": "cypress/support/commands.js",
+   "resource": "git.patch_content",
+   "url": "https://github.com/eea/volto-anchors/blob/14ff046481dbe87aa3174682175f1de64f8b98e0/cypress/support/commands.js#L18"
+  },
+  "Tags": [
+   "literal-secret",
+   "literal-secret"
+  ],
+  "Fingerprint": "14ff046481dbe87aa3174682175f1de64f8b98e0:cypress/support/commands.js:secret-literal-assignment:18",
+  "File": "cypress/support/commands.js",
+  "SymlinkFile": "",
+  "Commit": "14ff046481dbe87aa3174682175f1de64f8b98e0",
+  "Entropy": 2.947703,
+  "Author": "Nilesh",
+  "Email": "nileshgulia@gmail.com",
+  "Date": "2023-01-30T14:40:18Z",
+  "Message": "Initial commit"
+ }
+]
