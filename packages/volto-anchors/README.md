@@ -10,6 +10,19 @@
 
 ![Anchors](https://raw.githubusercontent.com/eea/volto-anchors/master/docs/volto-anchors.gif)
 
+## Upgrade
+
+### Upgrading to 3.x
+
+> This version requires `Volto 18` or `Volto 19` and Node.js 22.
+
+The add-on keeps the same API, so upgrading from 2.x on Volto 18 needs no code changes. The release adds Volto 19 support and moves the repository to the Volto 19 layout, where the published package lives in `packages/volto-anchors`.
+
+#### Breaking changes
+
+- **Node.js 22 or newer is required** (`engines.node >= 22`), 2.x declared no engine.
+- **React 18 is required.** The package declares `react` and `react-dom` as `^18.2.0` peers, 2.x declared no peers.
+
 ## Requirements
 
 ### Backend
